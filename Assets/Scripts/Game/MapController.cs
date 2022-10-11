@@ -57,7 +57,7 @@ namespace Game
             GenerateStateToRandomCellsFromList(waterCellsNumber, CellState.WATER, ref pairs); //generate random
             GenerateStateToRandomCellsFromList(swampCellsNumber, CellState.SWAMP, ref pairs);
             GenerateStateToRandomCellsFromList(sandCellsNumber, CellState.SAND, ref pairs);
-            GenerateBuildingsToRandomCellsFromList(buildingCellsNumber, ref pairs);
+            GenerateBuildingModelToRandomCellsFromList(buildingCellsNumber, ref pairs);
 
             foreach (var cellModel in map)
             {
@@ -65,24 +65,13 @@ namespace Game
                     new Vector3(cellModel.X, 0, cellModel.Y),
                     Quaternion.identity,
                     transform);
-                view.CellModel = cellModel; //?
+                cellModel.CellView=view; 
                 if (cellModel.BuildingModel != null)
                 {
                     CreateBuilding(view.transform.position, cellModel.BuildingModel);
                 }
                 else
                     view.ChangeVisual(ChooseCellVisualByState(cellModel.CellState));
-            }
-        }
-
-        private void GenerateBuildingsToRandomCellsFromList(int number, ref List<(int, int)> pairs)
-        {
-            for (int i = 0; i < number; i++)
-            {
-                var rnd = Random.Range(0, pairs.Count);
-                (int x, int y) = pairs[rnd];
-                map[x, y].BuildingModel = new BuildingModel(1);
-                pairs.Remove((x, y));
             }
         }
 
@@ -316,6 +305,37 @@ namespace Game
                 map[x, y].CellState = cellState;
                 pairs.Remove((x, y));
             }
+        }
+
+        private void GenerateBuildingModelToRandomCellsFromList(int number, ref List<(int, int)> pairs)
+        {
+            for (int i = 0; i < number; i++)
+            {
+                var rnd = Random.Range(0, pairs.Count);
+                (int x, int y) = pairs[rnd];
+                map[x, y].BuildingModel = new BuildingModel(1);
+                pairs.Remove((x, y));
+            }
+        }
+
+        public void PrepareCell(int x, int y)
+        {
+            var cell = map[x, y];
+            CellState newState;
+            switch (cell.CellState)
+            {
+                case CellState.WATER:
+                    newState = CellState.SWAMP;
+                    break;
+                case CellState.SWAMP:
+                    newState = CellState.SAND;
+                    break;
+                default:
+                    return;
+            }
+
+            cell.CellState = newState;
+            cell.CellView.ChangeVisual(ChooseCellVisualByState(newState));
         }
     }
 }

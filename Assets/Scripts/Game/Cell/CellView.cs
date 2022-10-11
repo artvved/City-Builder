@@ -5,7 +5,6 @@ namespace Game
     public class CellView : MonoBehaviour
     {
         [SerializeField] private GameObject visual;
-        public CellModel CellModel { get; set; }
 
         public void ChangeVisual(GameObject visualPrefab)
         {

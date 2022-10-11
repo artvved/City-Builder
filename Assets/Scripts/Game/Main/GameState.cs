@@ -2,6 +2,6 @@
 {
     public enum GameState
     {
-        LOOK,CHOOSE_BUILDING,BUILD
+        LOOK,CHOOSE_BUILDING,BUILD,PREPARE
     }
 }

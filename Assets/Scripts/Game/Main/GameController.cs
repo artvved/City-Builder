@@ -11,12 +11,14 @@ namespace Game
         [SerializeField] private CameraController cameraController;
         [SerializeField] private Camera camera;
 
-        [Header("UI")] [SerializeField] private Button buildButton;
+        [Header("UI: Build")] [SerializeField] private Button buildButton;
         [SerializeField] private GameObject buildMenu;
         [SerializeField] private Button spawnButton1;
         [SerializeField] private Button spawnButton2;
         [SerializeField] private Button spawnButton3;
         [SerializeField] private Button finishBuildingButton;
+        [Header("UI: Prepare")] [SerializeField] private Button prepareButton;
+        
 
 
         private GameState gameState;
@@ -61,6 +63,11 @@ namespace Game
             {
                 ChooseBuilding(3);
             });
+            
+            prepareButton.onClick.AddListener(delegate
+            {
+                SwitchState(GameState.PREPARE);
+            });
 
 
             gameState = GameState.LOOK;
@@ -97,6 +104,21 @@ namespace Game
 
                         cameraController.MoveCamera();
                         break;
+                    case GameState.PREPARE:
+
+                        if (Input.GetMouseButtonDown(0))
+                        {
+                            cameraController.SetDragStartPosition();
+                            PrepareCell();
+                        }
+
+                        if (Input.GetMouseButton(0))
+                        {
+                            cameraController.SetDragCurrentPosition();
+                        }
+
+                        cameraController.MoveCamera();
+                        break;
                     
                     case GameState.CHOOSE_BUILDING:
                         
@@ -114,8 +136,8 @@ namespace Game
                             if (cameraController.IsRaycastSucceessful())
                             {
                                 var pos = cameraController.GetRaycastPoint();
-                                pos.x = (int) pos.x;
-                                pos.z = (int) pos.z;
+                                pos.x = Mathf.RoundToInt(pos.x);
+                                pos.z = Mathf.RoundToInt(pos.z);
                                 CreateNewBuilding(pos);
                             }
                         }
@@ -136,6 +158,15 @@ namespace Game
                         break;
                 }
             }
+        }
+
+        private void PrepareCell()
+        {
+            var pos = cameraController.GetRaycastPoint();
+            Debug.DrawLine(new Vector3( pos.x, 0,  pos.z), new Vector3( pos.x, 5,  pos.z),
+                Color.blue, 10000);
+            mapController.PrepareCell(Mathf.RoundToInt(pos.x),Mathf.RoundToInt(pos.z));
+            
         }
 
         private void FinishNewBuilding()

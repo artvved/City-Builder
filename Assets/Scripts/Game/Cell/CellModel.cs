@@ -2,6 +2,8 @@
 {
     public class CellModel
     {
+        public CellView CellView { get; set; }
+        
         private int x;
         public int X => x;
         

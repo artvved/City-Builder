@@ -2,6 +2,6 @@
 {
     public enum CellState
     {
-        GRASS,SAND,WATER,SWAMP,BUILDING
+        GRASS,SAND,WATER,SWAMP
     }
 }

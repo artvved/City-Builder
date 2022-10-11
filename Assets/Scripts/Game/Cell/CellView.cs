@@ -12,10 +12,6 @@ namespace Game
            Destroy(visual.gameObject);
            visual = Instantiate(visualPrefab, transform);
         }
-
-        public void CreateBuilding(GameObject buildPrefab)
-        {
-            Instantiate(buildPrefab, visual.transform);
-        }
+        
     }
 }

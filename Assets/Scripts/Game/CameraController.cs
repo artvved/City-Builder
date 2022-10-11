@@ -7,11 +7,12 @@ using Debug = UnityEngine.Debug;
 
 public class CameraController : MonoBehaviour
 {
-    [SerializeField] private Camera camera;
     [SerializeField] private float movementSpeed;
-    
+    private Camera camera;
+
     private Vector3 newTargetPosition;
-    
+    public bool IsDraggable { get; set; }
+
     private Vector3 dragStartPos;
     private Vector3 dragCurrentPos;
 
@@ -30,48 +31,70 @@ public class CameraController : MonoBehaviour
         downBound = down;
     }
 
-    private void Start()
+    public void Init(Plane plane,Camera camera)
     {
-        plane = new Plane(Vector3.up, Vector3.zero);
+        this.plane = plane;
+        this.camera = camera;
+        ResetTarget();
+    }
+    
+
+    public void ResetTarget()
+    {
+        IsDraggable = false;
         newTargetPosition = transform.position;
     }
 
-    private void Update()
+    public bool IsRaycastSucceessful()
     {
-        if (Input.GetMouseButtonDown(0))
+        float entry;
+        Ray ray = camera.ScreenPointToRay(Input.mousePosition);
+        return plane.Raycast(ray, out entry);
+    }
+    
+    public Vector3 GetRaycastPoint()
+    {
+        float entry;
+        Ray ray = camera.ScreenPointToRay(Input.mousePosition);
+        if ( plane.Raycast(ray, out entry))
         {
-            Ray ray = camera.ScreenPointToRay(Input.mousePosition);
-
-            float entry;
-          
-            if (plane.Raycast(ray,out entry))
-            { 
-               
-                dragStartPos = ray.GetPoint(entry);
-            }
+            return ray.GetPoint(entry);
         }
-        
-        if (Input.GetMouseButton(0))
-        {
-            Ray ray = camera.ScreenPointToRay(Input.mousePosition);
+        return Vector3.zero;
+    }
 
-            float entry;
-            if (plane.Raycast(ray,out entry))
-            {
-                dragCurrentPos = ray.GetPoint(entry);
-                newTargetPosition = transform.position + dragStartPos - dragCurrentPos;
+    public void SetDragStartPosition()
+    {
+        if (IsRaycastSucceessful())
+        {
+            IsDraggable = true;     
+            dragStartPos = GetRaycastPoint();
+           
+        }
+    }
+    
+    public void SetDragCurrentPosition()
+    {
+        if (IsRaycastSucceessful())
+        {
+            dragCurrentPos = GetRaycastPoint();
+            newTargetPosition = transform.position + dragStartPos - dragCurrentPos;
                 
+        }
+    }
+
+    
+
+    public void MoveCamera()
+    {
+        if (IsDraggable)
+        {
+            var newPos=Vector3.MoveTowards(transform.position,newTargetPosition,Time.deltaTime*movementSpeed);
+            if (!IsOutOfBounds(newPos))
+            {
+                transform.position = newPos;
             }
         }
-
-        var newPos=Vector3.MoveTowards(transform.position,newTargetPosition,Time.deltaTime*movementSpeed);
-        
-        
-        if (!IsOutOfBounds(newPos))
-        {
-            transform.position = newPos;
-        }
-
     }
 
 

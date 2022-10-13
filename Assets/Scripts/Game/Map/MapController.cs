@@ -233,16 +233,20 @@ namespace Game
             //bounds check
             if (buildingSize % 2 == 0)
             {
-                if (centerX + 1 - half < 0 || centerY - half < 0 || centerX + 1 + half > mapModel.Width ||
-                    centerY + half > mapModel.Height)
+                if (IsXOutOfWidth(centerX + 1 - half) ||
+                    IsYOutOfHeight(centerY - half) ||
+                    IsXOutOfWidth(centerX + 1 + half)  ||
+                    IsYOutOfHeight(centerY + half))
                 {
                     return false;
                 }
             }
             else
             {
-                if (centerX - half < 0 || centerY - half < 0 || centerX + half >= mapModel.Width ||
-                    centerY + half >= mapModel.Height)
+                if (IsXOutOfWidth(centerX - half)||
+                    IsYOutOfHeight(centerY - half) ||
+                    IsXOutOfWidth(centerX + half+1) ||
+                    IsYOutOfHeight(centerY + half+1))
                 {
                     return false;
                 }
@@ -309,6 +313,16 @@ namespace Game
             return true;
         }
 
+        private bool IsXOutOfWidth(float x)
+        {
+            return (x < 0  || x > mapModel.Width );
+        }
+        
+        
+        private bool IsYOutOfHeight(float y)
+        {
+            return (y < 0  || y > mapModel.Height );
+        }
 
         private bool IsCellEmpty(int x, int y)
         {
@@ -348,6 +362,10 @@ namespace Game
 
         public void PrepareCell(int x, int y)
         {
+            if (IsXOutOfWidth(x) || IsYOutOfHeight(y))
+            {
+                return;
+            }
             var cell = mapModel.Map[x, y];
             CellState newState;
             switch (cell.CellState)

@@ -23,31 +23,51 @@
         "x": 0,
         "y": 2,
         "CellState": 0,
-        "BuildingModel": null
+        "BuildingModel": {
+          "size": 2,
+          "x": 0.5,
+          "y": 2.5
+        }
       },
       {
         "x": 0,
         "y": 3,
         "CellState": 1,
-        "BuildingModel": null
+        "BuildingModel": {
+          "size": 2,
+          "x": 0.5,
+          "y": 2.5
+        }
       },
       {
         "x": 0,
         "y": 4,
-        "CellState": 3,
-        "BuildingModel": null
+        "CellState": 1,
+        "BuildingModel": {
+          "size": 3,
+          "x": 1.0,
+          "y": 5.0
+        }
       },
       {
         "x": 0,
         "y": 5,
         "CellState": 0,
-        "BuildingModel": null
+        "BuildingModel": {
+          "size": 3,
+          "x": 1.0,
+          "y": 5.0
+        }
       },
       {
         "x": 0,
         "y": 6,
         "CellState": 0,
-        "BuildingModel": null
+        "BuildingModel": {
+          "size": 3,
+          "x": 1.0,
+          "y": 5.0
+        }
       },
       {
         "x": 0,
@@ -88,7 +108,7 @@
       {
         "x": 0,
         "y": 13,
-        "CellState": 3,
+        "CellState": 1,
         "BuildingModel": null
       },
       {
@@ -625,31 +645,51 @@
         "x": 1,
         "y": 2,
         "CellState": 0,
-        "BuildingModel": null
+        "BuildingModel": {
+          "size": 2,
+          "x": 0.5,
+          "y": 2.5
+        }
       },
       {
         "x": 1,
         "y": 3,
         "CellState": 0,
-        "BuildingModel": null
+        "BuildingModel": {
+          "size": 2,
+          "x": 0.5,
+          "y": 2.5
+        }
       },
       {
         "x": 1,
         "y": 4,
         "CellState": 0,
-        "BuildingModel": null
+        "BuildingModel": {
+          "size": 3,
+          "x": 1.0,
+          "y": 5.0
+        }
       },
       {
         "x": 1,
         "y": 5,
         "CellState": 0,
-        "BuildingModel": null
+        "BuildingModel": {
+          "size": 3,
+          "x": 1.0,
+          "y": 5.0
+        }
       },
       {
         "x": 1,
         "y": 6,
         "CellState": 0,
-        "BuildingModel": null
+        "BuildingModel": {
+          "size": 3,
+          "x": 1.0,
+          "y": 5.0
+        }
       },
       {
         "x": 1,
@@ -684,7 +724,7 @@
       {
         "x": 1,
         "y": 12,
-        "CellState": 2,
+        "CellState": 1,
         "BuildingModel": null
       },
       {
@@ -1226,7 +1266,7 @@
       {
         "x": 2,
         "y": 2,
-        "CellState": 2,
+        "CellState": 1,
         "BuildingModel": null
       },
       {
@@ -1239,19 +1279,31 @@
         "x": 2,
         "y": 4,
         "CellState": 0,
-        "BuildingModel": null
+        "BuildingModel": {
+          "size": 3,
+          "x": 1.0,
+          "y": 5.0
+        }
       },
       {
         "x": 2,
         "y": 5,
         "CellState": 0,
-        "BuildingModel": null
+        "BuildingModel": {
+          "size": 3,
+          "x": 1.0,
+          "y": 5.0
+        }
       },
       {
         "x": 2,
         "y": 6,
         "CellState": 0,
-        "BuildingModel": null
+        "BuildingModel": {
+          "size": 3,
+          "x": 1.0,
+          "y": 5.0
+        }
       },
       {
         "x": 2,
@@ -1262,7 +1314,7 @@
       {
         "x": 2,
         "y": 8,
-        "CellState": 2,
+        "CellState": 1,
         "BuildingModel": null
       },
       {
@@ -1870,7 +1922,7 @@
       {
         "x": 3,
         "y": 9,
-        "CellState": 3,
+        "CellState": 1,
         "BuildingModel": null
       },
       {
@@ -2440,7 +2492,7 @@
       {
         "x": 4,
         "y": 3,
-        "CellState": 2,
+        "CellState": 1,
         "BuildingModel": null
       },
       {
@@ -4240,7 +4292,7 @@
       {
         "x": 7,
         "y": 0,
-        "CellState": 3,
+        "CellState": 1,
         "BuildingModel": null
       },
       {
@@ -4848,7 +4900,7 @@
       {
         "x": 8,
         "y": 1,
-        "CellState": 3,
+        "CellState": 1,
         "BuildingModel": null
       },
       {
@@ -4896,7 +4948,7 @@
       {
         "x": 8,
         "y": 9,
-        "CellState": 3,
+        "CellState": 1,
         "BuildingModel": null
       },
       {
@@ -5500,7 +5552,7 @@
       {
         "x": 9,
         "y": 8,
-        "CellState": 2,
+        "CellState": 1,
         "BuildingModel": null
       },
       {

@@ -24,16 +24,22 @@ namespace Game
         [Range(0f, 1f)] [SerializeField] private float sandChance;
 
 
-        public int Width => width;
+        private MapModel mapModel;
 
-        public int Height => height;
+        public MapModel MapModel => mapModel;
 
-        private CellModel[,] map;
-
+        public void CreateMap(MapModel model)
+        {
+            DestroyCurrentMap();
+            mapModel = model;
+            InstantiateCells();
+            InstantiateBuildings();
+        }
 
         public void CreateMap()
         {
-            map = new CellModel[width, height];
+            mapModel = new MapModel(width, height);
+
             int count = width * height;
             var pairs = new List<(int, int)>();
 
@@ -48,7 +54,7 @@ namespace Game
                 for (int j = 0; j < height; j++)
                 {
                     var cell = new CellModel(i, j, CellState.GRASS);
-                    map[i, j] = cell;
+                    mapModel.Map[i, j] = cell;
                     pairs.Add((i, j));
                 }
             }
@@ -57,50 +63,84 @@ namespace Game
             GenerateStateToRandomCellsFromList(waterCellsNumber, CellState.WATER, ref pairs); //generate random
             GenerateStateToRandomCellsFromList(swampCellsNumber, CellState.SWAMP, ref pairs);
             GenerateStateToRandomCellsFromList(sandCellsNumber, CellState.SAND, ref pairs);
-            GenerateBuildingModelToRandomCellsFromList(buildingCellsNumber, ref pairs);
 
-            foreach (var cellModel in map)
+            InstantiateCells();
+
+            GenerateAndInstantiateBuildingsToRandomCellsFromList(buildingCellsNumber, ref pairs);
+        }
+
+        private void InstantiateCells()
+        {
+            foreach (var cellModel in mapModel.Map)
             {
                 var view = Instantiate(cellViewPrefab,
                     new Vector3(cellModel.X, 0, cellModel.Y),
                     Quaternion.identity,
                     transform);
-                cellModel.CellView=view; 
-                if (cellModel.BuildingModel != null)
-                {
-                    CreateBuilding(view.transform.position, cellModel.BuildingModel);
-                }
-                else
-                    view.ChangeVisual(ChooseCellVisualByState(cellModel.CellState));
+                cellModel.CellView = view;
+                view.ChangeVisual(ChooseCellVisualByState(cellModel.CellState));
             }
         }
 
-        public BuildingView CreateBuilding(Vector3 pos, int size)
+        private void InstantiateBuildings()
+        {
+            HashSet<BuildingModel> set = new HashSet<BuildingModel>();
+            foreach (var cellModel in mapModel.Map)
+            {
+                var buildingModel = cellModel.BuildingModel;
+                if (buildingModel != null && !set.Contains(buildingModel))
+                {
+                    set.Add(buildingModel);
+                    CreateUnfixedBuilding(new Vector3(buildingModel.X, 0, buildingModel.Y), buildingModel);
+                    PlaceBuilding(buildingModel, false);
+                }
+            }
+        }
+
+        private void GenerateAndInstantiateBuildingsToRandomCellsFromList(int number, ref List<(int, int)> pairs)
+        {
+            for (int i = 0; i < number; i++)
+            {
+                var rnd = Random.Range(0, pairs.Count);
+                (int x, int y) = pairs[rnd];
+                var b = CreateUnfixedBuilding(mapModel.Map[x, y].CellView.transform.position, 1);
+                PlaceBuilding(b);
+                pairs.Remove((x, y));
+            }
+        }
+
+
+        public BuildingModel CreateUnfixedBuilding(Vector3 pos, int size)
         {
             var view = Instantiate(buildingPrefab, pos, Quaternion.identity, transform);
             var model = new BuildingModel(size);
-            view.Model = model;
-            return view;
+            model.BuildingView = view;
+            view.ChangeVisualSize(model.Size);
+            return model;
         }
 
-        public BuildingView CreateBuilding(Vector3 pos, BuildingModel model)
+        public void CreateUnfixedBuilding(Vector3 pos, BuildingModel model)
         {
             var view = Instantiate(buildingPrefab, pos, Quaternion.identity, transform);
-            view.Model = model;
-            return view;
+            view.ChangeVisualSize(model.Size);
+            model.BuildingView = view;
         }
 
-        public void PlaceBuilding(BuildingView buildingView)
+        public void PlaceBuilding(BuildingModel buildingModel)
         {
-            if (!CanPlaceBuilding(buildingView))
+            PlaceBuilding(buildingModel, true);
+        }
+
+        private void PlaceBuilding(BuildingModel buildingModel, bool check)
+        {
+            if (check && !CanPlaceBuilding(buildingModel))
             {
-                return ;
+                return;
             }
 
-            Vector3 pos = buildingView.transform.position;
-            int buildingSize = buildingView.Model.Size;
+            Vector3 pos = buildingModel.BuildingView.transform.position;
+            int buildingSize = buildingModel.Size;
 
-            //bounds check
             int half = Mathf.FloorToInt(buildingSize / 2f);
 
             int centerX;
@@ -128,10 +168,8 @@ namespace Game
 
             for (int i = 0; i < (buildingSize * buildingSize); i++)
             {
-                
-                    map[x, y].BuildingModel = buildingView.Model;
-                
-
+                mapModel.Map[x, y].BuildingModel = buildingModel;
+                buildingModel.SaveVisualPosition();
                 lenI++;
                 if (lenI == len)
                 {
@@ -170,14 +208,13 @@ namespace Game
                 y += dy;
                 x += dx;
             }
-            
         }
 
-        public bool CanPlaceBuilding(BuildingView buildingView)
+        public bool CanPlaceBuilding(BuildingModel buildingModel)
         {
-            Vector3 pos = buildingView.transform.position;
-            int buildingSize = buildingView.Model.Size;
-            
+            Vector3 pos = buildingModel.BuildingView.transform.position;
+            int buildingSize = buildingModel.Size;
+
             int half = Mathf.FloorToInt(buildingSize / 2f);
 
             int centerX;
@@ -196,19 +233,20 @@ namespace Game
             //bounds check
             if (buildingSize % 2 == 0)
             {
-                if (centerX+1 - half < 0 || centerY - half < 0 || centerX+1 + half > width || centerY + half > height)
+                if (centerX + 1 - half < 0 || centerY - half < 0 || centerX + 1 + half > mapModel.Width ||
+                    centerY + half > mapModel.Height)
                 {
                     return false;
                 }
             }
             else
             {
-                if (centerX - half < 0 || centerY - half < 0 || centerX + half >= width || centerY + half >= height)
+                if (centerX - half < 0 || centerY - half < 0 || centerX + half >= mapModel.Width ||
+                    centerY + half >= mapModel.Height)
                 {
                     return false;
                 }
             }
-
 
 
             int len = buildingSize;
@@ -219,7 +257,7 @@ namespace Game
             int dy = 1;
 
             int lenI = 0;
-            
+
 
             for (int i = 0; i < (buildingSize * buildingSize); i++)
             {
@@ -274,9 +312,9 @@ namespace Game
 
         private bool IsCellEmpty(int x, int y)
         {
-            return map[x, y].BuildingModel == null &&
-                   map[x, y].CellState != CellState.WATER &&
-                   map[x, y].CellState != CellState.SWAMP;
+            return mapModel.Map[x, y].BuildingModel == null &&
+                   mapModel.Map[x, y].CellState != CellState.WATER &&
+                   mapModel.Map[x, y].CellState != CellState.SWAMP;
         }
 
         private GameObject ChooseCellVisualByState(CellState state)
@@ -302,25 +340,15 @@ namespace Game
             {
                 var rnd = Random.Range(0, pairs.Count);
                 (int x, int y) = pairs[rnd];
-                map[x, y].CellState = cellState;
+                mapModel.Map[x, y].CellState = cellState;
                 pairs.Remove((x, y));
             }
         }
 
-        private void GenerateBuildingModelToRandomCellsFromList(int number, ref List<(int, int)> pairs)
-        {
-            for (int i = 0; i < number; i++)
-            {
-                var rnd = Random.Range(0, pairs.Count);
-                (int x, int y) = pairs[rnd];
-                map[x, y].BuildingModel = new BuildingModel(1);
-                pairs.Remove((x, y));
-            }
-        }
 
         public void PrepareCell(int x, int y)
         {
-            var cell = map[x, y];
+            var cell = mapModel.Map[x, y];
             CellState newState;
             switch (cell.CellState)
             {
@@ -336,6 +364,22 @@ namespace Game
 
             cell.CellState = newState;
             cell.CellView.ChangeVisual(ChooseCellVisualByState(newState));
+        }
+
+        public void DestroyCurrentMap()
+        {
+            var cells = GetComponentsInChildren<CellView>();
+            var buildingViews = GetComponentsInChildren<BuildingView>();
+
+            for (int i = 0; i < cells.Length; i++)
+            {
+                Destroy(cells[i].gameObject);
+            }
+
+            for (int i = 0; i < buildingViews.Length; i++)
+            {
+                Destroy(buildingViews[i].gameObject);
+            }
         }
     }
 }

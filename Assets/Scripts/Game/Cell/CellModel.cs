@@ -1,25 +1,42 @@
-﻿namespace Game
+﻿using System;
+using Newtonsoft.Json;
+
+namespace Game
 {
+    [Serializable]
     public class CellModel
     {
-        public CellView CellView { get; set; }
-        
+        [JsonIgnore] private CellView cellView;
+
+        [JsonProperty]
         private int x;
-        public int X => x;
-        
+        [JsonProperty]
         private int y;
+
+        [JsonIgnore]
+        public int X => x;
+        [JsonIgnore]
         public int Y => y;
         
+        [JsonProperty]
         public CellState CellState { get; set; }
+
+        
         public BuildingModel BuildingModel { get; set; }
 
-        public CellModel( int x, int y,CellState cellState)
+        [JsonIgnore]
+        public CellView CellView
+        {
+            get => cellView;
+            set => cellView = value;
+        }
+
+
+        public CellModel(int x, int y, CellState cellState)
         {
             this.CellState = cellState;
             this.x = x;
             this.y = y;
         }
-
-       
     }
 }

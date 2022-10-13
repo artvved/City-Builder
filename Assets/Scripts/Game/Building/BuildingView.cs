@@ -9,22 +9,13 @@ namespace Game
         [SerializeField] private Material green;
         [SerializeField] private Material basic;
         [SerializeField] private MeshRenderer meshRenderer;
-        private BuildingModel model;
-        public BuildingModel Model {
-            get => model;
-            set
-            {
-                model = value;
-                ChangeVisualSize();
-            }
-        }
+       
 
         private Material basicMaterial;
        
 
-        private void ChangeVisualSize()
+        public void ChangeVisualSize(int size)
         {
-            var size = Model.Size;
             var t = transform.position;
             transform.transform.localScale = new Vector3(size, size, size);
             transform.position = t;

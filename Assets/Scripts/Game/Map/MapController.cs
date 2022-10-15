@@ -92,7 +92,7 @@ namespace Game
                 {
                     set.Add(buildingModel);
                     CreateUnfixedBuilding(new Vector3(buildingModel.X, 0, buildingModel.Y), buildingModel);
-                    PlaceBuilding(buildingModel, false);
+                    PlaceBuilding(buildingModel, false,true);
                 }
             }
         }
@@ -128,10 +128,15 @@ namespace Game
 
         public void PlaceBuilding(BuildingModel buildingModel)
         {
-            PlaceBuilding(buildingModel, true);
+            PlaceBuilding(buildingModel, true,true);
         }
 
-        private void PlaceBuilding(BuildingModel buildingModel, bool check)
+        public void UnplaceBuilding(BuildingModel buildingModel)
+        {
+            PlaceBuilding(buildingModel, false, false);
+        }
+
+        private void PlaceBuilding(BuildingModel buildingModel, bool check, bool place)
         {
             if (check && !CanPlaceBuilding(buildingModel))
             {
@@ -168,8 +173,16 @@ namespace Game
 
             for (int i = 0; i < (buildingSize * buildingSize); i++)
             {
-                mapModel.Map[x, y].BuildingModel = buildingModel;
-                buildingModel.SaveVisualPosition();
+                if (place)
+                {
+                    mapModel.Map[x, y].BuildingModel = buildingModel;
+                   
+                }
+                else
+                {
+                    mapModel.Map[x, y].BuildingModel = null;
+                }
+
                 lenI++;
                 if (lenI == len)
                 {
@@ -207,6 +220,14 @@ namespace Game
 
                 y += dy;
                 x += dx;
+            }
+            if (place)
+            {
+                buildingModel.SaveVisualPosition();
+            }
+            else
+            {
+                Destroy(buildingModel.BuildingView.gameObject);
             }
         }
 
@@ -317,8 +338,6 @@ namespace Game
         {
             return (x < 0  || x > mapModel.Width );
         }
-        
-        
         private bool IsYOutOfHeight(float y)
         {
             return (y < 0  || y > mapModel.Height );
@@ -359,6 +378,19 @@ namespace Game
             }
         }
 
+        public BuildingModel GetBuilding(int x, int y)
+        {
+            if (IsXOutOfWidth(x) || IsYOutOfHeight(y) || mapModel.Map[x,y].BuildingModel==null)
+            {
+                return null;
+            }
+            else
+            {
+                return mapModel.Map[x, y].BuildingModel;
+            }
+
+        }
+
 
         public void PrepareCell(int x, int y)
         {
@@ -384,7 +416,7 @@ namespace Game
             cell.CellView.ChangeVisual(ChooseCellVisualByState(newState));
         }
 
-        public void DestroyCurrentMap()
+        private void DestroyCurrentMap()
         {
             var cells = GetComponentsInChildren<CellView>();
             var buildingViews = GetComponentsInChildren<BuildingView>();
@@ -399,5 +431,9 @@ namespace Game
                 Destroy(buildingViews[i].gameObject);
             }
         }
+
+       
+        
+        
     }
 }

@@ -57,5 +57,7 @@ namespace Game
             x = BuildingView.transform.position.x;
             y = BuildingView.transform.position.z;
         }
+
+       
     }
 }
